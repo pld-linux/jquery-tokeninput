@@ -1,12 +1,12 @@
 %define		plugin	tokeninput
 Summary:	jQuery Tokenizing Autocomplete Text Entry
 Name:		jquery-%{plugin}
-Version:	1.4.2
+Version:	1.6.0
 Release:	1
 License:	MIT / GPL
 Group:		Applications/WWW
 Source0:	https://github.com/loopj/jquery-tokeninput/tarball/jquery-tokeninput-%{version}#/%{plugin}-%{version}.tgz
-# Source0-md5:	30e7582fb7d929c31e6ad9036b899288
+# Source0-md5:	f8bdaded08410b564c744dad6640dd01
 URL:		http://loopj.com/jquery-tokeninput/
 BuildRequires:	js
 BuildRequires:	rpmbuild(macros) > 1.268
@@ -37,20 +37,51 @@ Demonstrations and samples for jQuery.tokeninput.
 %setup -qc
 mv *-%{name}-*/* .
 
+# unify filenames
+for a in styles/*.css; do
+	dir=${a%/*}
+	mv $a $dir/%{plugin}${a#*/token-input}
+done
+
 %build
 install -d build/styles
-# compress .js
-yuicompressor --charset UTF-8 src/jquery.%{plugin}.js -o build/jquery.%{plugin}.js
-js -C -f build/jquery.%{plugin}.js
 
-for css in styles/*.css; do
-	yuicompressor --charset UTF-8 $css -o build/$css
+# compress .js
+for src in src/*.js; do
+	fname=${src#*/jquery.}
+	out=build/$fname
+	out=${out%.js}-%{version}.min.js
+%if 0%{!?debug:1}
+	yuicompressor --charset UTF-8 $src -o $out
+	js -C -f $out
+%else
+	cp -p $src $out
+%endif
+	outdir=${out%/*}
+	ln -s ${out##*/} $outdir/$fname
+done
+
+# pack .css
+for src in styles/*.css; do
+	out=build/${src#*/jquery.}
+	out=${out%.css}-%{version}.min.css
+%if 0%{!?debug:1}
+	yuicompressor --charset UTF-8 $src -o $out
+%else
+	cp -p $src $out
+%endif
+	outdir=${out%/*}
+	ln -s ${out##*/} $outdir/${src##*/}
 done
 
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{_appdir},%{_examplesdir}/%{name}-%{version}}
-cp -a build/* $RPM_BUILD_ROOT%{_appdir}
+cp -p src/jquery.%{plugin}.js $RPM_BUILD_ROOT%{_appdir}/%{plugin}-%{version}.js
+cp -a build/*.js  $RPM_BUILD_ROOT%{_appdir}
+
+cp -a styles/* $RPM_BUILD_ROOT%{_appdir}
+cp -a build/styles/* $RPM_BUILD_ROOT%{_appdir}
 
 cp -a demo.html examples $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
 
