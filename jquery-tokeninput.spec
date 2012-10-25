@@ -2,11 +2,12 @@
 Summary:	jQuery Tokenizing Autocomplete Text Entry
 Name:		jquery-%{plugin}
 Version:	1.6.0
-Release:	1
+Release:	2
 License:	MIT / GPL
 Group:		Applications/WWW
-Source0:	https://github.com/loopj/jquery-tokeninput/tarball/jquery-tokeninput-%{version}#/%{plugin}-%{version}.tgz
-# Source0-md5:	f8bdaded08410b564c744dad6640dd01
+#Source0:	https://github.com/loopj/jquery-tokeninput/tarball/jquery-tokeninput-%{version}#/%{plugin}-%{version}.tgz
+Source0:	https://github.com/loopj/jquery-tokeninput/tarball/master/%{plugin}-%{version}-master.tgz
+# Source0-md5:	0896f48b52c6461de98002b4e0738c47
 URL:		http://loopj.com/jquery-tokeninput/
 BuildRequires:	js
 BuildRequires:	rpmbuild(macros) > 1.268
